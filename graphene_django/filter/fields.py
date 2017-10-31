@@ -2,9 +2,16 @@ from collections import OrderedDict
 from functools import partial
 
 from graphene.types.argument import to_arguments
+from graphene import List, String
 from ..fields import DjangoConnectionField
 from .utils import get_filtering_args_from_filterset, get_filterset_class
 
+# TODO: remove this in final commit
+import sys
+sys.path.append('/home/rona/projects/moshimoji-backend/graphene-django-backend/config')
+import logger_import
+from logger_import import logger
+# <---
 
 class DjangoFilterConnectionField(DjangoConnectionField):
 
@@ -20,7 +27,10 @@ class DjangoFilterConnectionField(DjangoConnectionField):
 
     @property
     def args(self):
-        return to_arguments(self._base_args or OrderedDict(), self.filtering_args)
+        extra_args = {}
+        extra_args.update(self.filtering_args)
+        extra_args.update({'order_by': List(String).Argument()})
+        return to_arguments(self._base_args or OrderedDict(), extra_args)
 
     @args.setter
     def args(self, args):
@@ -70,11 +80,13 @@ class DjangoFilterConnectionField(DjangoConnectionField):
                             enforce_first_or_last, filterset_class, filtering_args,
                             root, info, **args):
         filter_kwargs = {k: v for k, v in args.items() if k in filtering_args}
+        ordering_args = args.get('order_by', None)
         qs = filterset_class(
             data=filter_kwargs,
             queryset=default_manager.get_queryset()
         ).qs
-
+        for arg in ordering_args:
+            qs = qs.order_by(arg)
         return super(DjangoFilterConnectionField, cls).connection_resolver(
             resolver,
             connection,
