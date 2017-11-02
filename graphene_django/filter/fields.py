@@ -8,9 +8,11 @@ from .utils import get_filtering_args_from_filterset, get_filterset_class
 
 # TODO: remove this in final commit
 import sys
-sys.path.append('/home/rona/projects/moshimoji-backend/graphene-django-backend/config')
-import logger_import
-from logger_import import logger
+# sys.path.append('/home/rona/projects/moshimoji-backend/graphene-django-backend/config')
+from config import logger_import
+from config.logger_import import logger
+
+logger.info("GRAPHENE_DJANGO: sys.path: %s" % sys.path)
 # <---
 
 class DjangoFilterConnectionField(DjangoConnectionField):
@@ -85,8 +87,9 @@ class DjangoFilterConnectionField(DjangoConnectionField):
             data=filter_kwargs,
             queryset=default_manager.get_queryset()
         ).qs
-        for arg in ordering_args:
-            qs = qs.order_by(arg)
+        if ordering_args:
+            for arg in ordering_args:
+                qs = qs.order_by(arg)
         return super(DjangoFilterConnectionField, cls).connection_resolver(
             resolver,
             connection,
