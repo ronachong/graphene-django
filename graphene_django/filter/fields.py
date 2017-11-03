@@ -6,15 +6,6 @@ from graphene import List, String
 from ..fields import DjangoConnectionField
 from .utils import get_filtering_args_from_filterset, get_filterset_class
 
-# TODO: remove this in final commit
-import sys
-# sys.path.append('/home/rona/projects/moshimoji-backend/graphene-django-backend/config')
-from config import logger_import
-from config.logger_import import logger
-
-logger.info("GRAPHENE_DJANGO: sys.path: %s" % sys.path)
-# <---
-
 class DjangoFilterConnectionField(DjangoConnectionField):
 
     def __init__(self, type, fields=None, order_by=None,
