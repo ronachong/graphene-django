@@ -6,6 +6,7 @@ from graphene import List, String
 from ..fields import DjangoConnectionField
 from .utils import get_filtering_args_from_filterset, get_filterset_class
 
+
 class DjangoFilterConnectionField(DjangoConnectionField):
 
     def __init__(self, type, fields=None, order_by=None,
@@ -78,9 +79,11 @@ class DjangoFilterConnectionField(DjangoConnectionField):
             data=filter_kwargs,
             queryset=default_manager.get_queryset()
         ).qs
+
         if ordering_args:
             for arg in ordering_args:
                 qs = qs.order_by(arg)
+
         return super(DjangoFilterConnectionField, cls).connection_resolver(
             resolver,
             connection,
